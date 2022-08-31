@@ -6,6 +6,9 @@
   "homepage": "",
   "license": "ISC",
   "main": "lib/core.js",
+  "bin": {
+    "yzming-cli-dev": "lib/index.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -16,5 +19,5 @@
   "scripts": {
     "test": "node ./__tests__/core.test.js"
   },
-  "gitHead": "6828156fd5f75255493e17f6fdeb1e4e34bc9a59"
+  "gitHead": "46d4a29d0732be18d23fad97ba077f9020425caf"
 }

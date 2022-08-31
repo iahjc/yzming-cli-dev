@@ -1,7 +1,3 @@
-'use strict';
+#! /usr/bin/env node
 
-module.exports = core;
-
-function core() {
-    return "Hello from core";
-}
+console.log('hello yzming-cli')
