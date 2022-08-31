@@ -1,0 +1,19 @@
+{
+  "name": "@yzming-cli-dev/core",
+  "version": "0.0.0",
+  "description": "yzming-cli-dev core",
+  "author": "alines <hanruigang@163.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/core.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "node ./__tests__/core.test.js"
+  }
+}

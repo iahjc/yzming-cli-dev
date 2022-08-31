@@ -1,0 +1,19 @@
+{
+  "name": "@yzming-cli-dev/utils",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "alines <hanruigang@163.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/create.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "node ./__tests__/create.test.js"
+  }
+}
