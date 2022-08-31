@@ -1,6 +1,6 @@
 {
   "name": "@yzming-cli-dev/core",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "yzming-cli-dev core",
   "author": "alines <hanruigang@163.com>",
   "homepage": "",
@@ -19,5 +19,8 @@
   "scripts": {
     "test": "node ./__tests__/core.test.js"
   },
-  "gitHead": "46d4a29d0732be18d23fad97ba077f9020425caf"
+  "gitHead": "52d58e4aa83a93b7fdef62cff19b6b1f89552128",
+  "publishConfig": {
+    "access": "public"
+  }
 }
