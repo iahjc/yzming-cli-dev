@@ -1,11 +1,11 @@
-# `create`
+# `utils`
 
 > TODO: description
 
 ## Usage
 
 ```
-const create = require('create');
+const utils = require('utils');
 
 // TODO: DEMONSTRATE API
 ```
