@@ -27,6 +27,9 @@
     "url": "https://github.com/iahjc/yzming-cli-dev/issues"
   },
   "dependencies": {
-    "@yzming-cli-dev/utils": "file:../../utils/utils"
+    "@yzming-cli-dev/get-npm-info": "file:../../utils/get-npm-info",
+    "@yzming-cli-dev/utils": "file:../../utils/utils",
+    "npminstall": "^6.5.1",
+    "path-exists": "^4.0.0"
   }
 }

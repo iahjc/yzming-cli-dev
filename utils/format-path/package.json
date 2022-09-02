@@ -25,5 +25,8 @@
   },
   "bugs": {
     "url": "https://github.com/iahjc/yzming-cli-dev/issues"
+  },
+  "dependencies": {
+    "@yzming-cli-dev/format-path" : "file:../../utils/format-path"
   }
 }

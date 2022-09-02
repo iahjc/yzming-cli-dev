@@ -2,7 +2,10 @@
 
 const pkgDir = require('pkg-dir').sync;
 const path = require('path');
-
+const pathExists = require('path-exists');
+const npminstall = require('npminstall');
+const formatPath = require('@yzming-cli-dev/format-path');
+const { getDefaultRegistry } = require('@yzming-cli-dev/get-npm-info')
 const { isObject } = require('@yzming-cli-dev/utils');
 
 
@@ -26,12 +29,32 @@ class Package {
         this.packageVersion = options.packageVersion;
     }
 
-    // 判断当前package是否存在
-    exists() {
+    prepare() {
 
     }
+
+    // 判断当前package是否存在
+    exists() {
+        if (this.storeDir) {
+            this.prepare();
+        } else {
+            return pathExists(this.targetPath);
+        }
+    }
     // 安装package
-    install() { }
+    install() {
+        return npminstall({
+            root: this.targetPath,
+            storeDir: this.storeDir,
+            registry: getDefaultRegistry(),
+            pkgs: [
+                {
+                    name: this.packageName,
+                    version: this.packageVersion
+                }
+            ]
+        })
+    }
     // 更新package
     update() { }
 
@@ -46,15 +69,12 @@ class Package {
             // 3. 寻找main/lib
             if (pkgFile && pkgFile.main) {
                 // 4. 路径兼容（macOS/windows）
-                return path.resolve(dir, pkgFile.main);
+                return formatPath(path.resolve(dir, pkgFile.main));
             }
-
         }
         return null;
     }
 }
-
-
 
 module.exports = Package;
 
