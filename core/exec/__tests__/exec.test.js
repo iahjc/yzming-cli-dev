@@ -1,6 +1,6 @@
 'use strict';
 
-const exec = require('..');
+const exec = require('../lib');
 const assert = require('assert').strict;
 
 assert.strictEqual(exec(), 'Hello from exec');

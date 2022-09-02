@@ -17,6 +17,7 @@ const commander = require('commander');
 const log = require('@yzming-cli-dev/log');
 const init = require('@yzming-cli-dev/init');
 const constant = require('./const');
+const exec = require('@yzming-cli-dev/exec');
 
 let args = null;
 let config = null;
@@ -56,7 +57,7 @@ function registerCommand() {
     program
         .command('init [projectName]')
         .option('-f, --force', '是否强制初始化项目')
-        .action(init);
+        .action(exec);
 
     // 开启debug模式
     program.on('option:debug', function() {

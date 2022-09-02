@@ -1,5 +1,5 @@
 {
-  "name": "@yzming-cli-dev/exec",
+  "name": "@yzming-cli-dev/package",
   "version": "1.0.3",
   "description": "> TODO: description",
   "author": "alines <hanruigang@163.com>",
@@ -21,12 +21,12 @@
     "url": "git+https://github.com/iahjc/yzming-cli-dev.git"
   },
   "scripts": {
-    "test": "node ./__tests__/@yzming-cli-dev/exec.test.js"
+    "test": "node ./__tests__/@yzming-cli-dev/package.test.js"
   },
   "bugs": {
     "url": "https://github.com/iahjc/yzming-cli-dev/issues"
   },
   "dependencies": {
-    "@yzming-cli-dev/package": "file:../../modules/package"
+    "@yzming-cli-dev/utils": "file:../../utils/utils"
   }
 }
