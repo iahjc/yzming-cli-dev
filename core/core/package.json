@@ -1,5 +1,5 @@
 {
-  "name": "@yzming-cli-dev/core",
+  "name": "@imooc-cli/core",
   "version": "1.0.3",
   "description": "yzming-cli-dev core",
   "author": "alines <hanruigang@163.com>",
@@ -20,9 +20,19 @@
     "test": "node ./__tests__/core.test.js"
   },
   "dependencies": {
+    "@yzming-cli-dev/get-npm-info": "file:../../utils/get-npm-info",
     "@yzming-cli-dev/log": "file:../../utils/log",
+    "@yzming-cli-dev/init": "file:../../commands/init",
+    "colors": "^1.4.0",
+    "commander": "^6.2.1",
+    "dotenv": "^16.0.2",
     "import-local": "^3.1.0",
-    "npmlog": "^6.0.2"
+    "minimist": "^1.2.6",
+    "npmlog": "^6.0.2",
+    "path-exists": "3.0.0",
+    "root-check": "1.0.0",
+    "semver": "^7.3.7",
+    "user-home": "2.0.0"
   },
   "gitHead": "52d58e4aa83a93b7fdef62cff19b6b1f89552128",
   "publishConfig": {
