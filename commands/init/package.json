@@ -29,9 +29,12 @@
   "dependencies": {
     "@yzming-cli-dev/command": "file:../../models/command",
     "@yzming-cli-dev/log": "file:../../utils/log",
+    "@yzming-cli-dev/package": "file:../../models/package",
     "@yzming-cli-dev/request": "file:../../utils/request",
+    "@yzming-cli-dev/utils": "file:../../utils/utils",
     "fs-extra": "^9.0.1",
     "inquirer": "^7.3.3",
-    "semver": "^7.3.7"
+    "semver": "^7.3.7",
+    "user-home": "^2.0.0"
   }
 }

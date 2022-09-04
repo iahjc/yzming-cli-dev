@@ -22,5 +22,8 @@
   },
   "bugs": {
     "url": "https://github.com/iahjc/yzming-cli-dev/issues"
+  },
+  "dependencies": {
+    "cli-spinner": "^0.2.10"
   }
 }

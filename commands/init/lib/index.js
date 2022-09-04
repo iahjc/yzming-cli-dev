@@ -1,14 +1,23 @@
 'use strict';
 
 const Command = require('@yzming-cli-dev/command');
-const fs = require('fs')
+const fs = require('fs');
+const path = require('path');
 const semver = require('semver');
 const inquirer = require('inquirer');
 const fse = require('fs-extra');
+const userHome = require('user-home');
+const log = require('@yzming-cli-dev/log');
+const Package = require('@yzming-cli-dev/package');
+const { spinnerStart, sleep, exec, execAsync } = require('@yzming-cli-dev/utils');
 
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
+const TEMPLATE_TYPE_NORMAL = 'normal';
+const TEMPLATE_TYPE_CUSTOM = 'custom';
 const getProjectTemplate = require('./getProjectTemplate');
+
+const WHITE_COMMAND = ['npm', 'cnpm'];
 
 
 class InitCommand extends Command {
@@ -19,7 +28,22 @@ class InitCommand extends Command {
 
     async prepare() {
         // 0 判断项目模版是否存在
-        const template = await getProjectTemplate();
+        // const template = await getProjectTemplate();
+        const template = [
+            {
+                "name": "vue-element-admin",
+                "npmName": "yzming-cli-template-vue-element-admin",
+                "version": "1.0.0"
+            },
+            {
+                "name": "vue3",
+                "npmName": "yzming-cli-template-vue3",
+                "version": "1.0.0",
+                "type": "normal",
+                "installCommand": "npm install",
+                "startCommand": "npm run serve"
+            }
+        ]
         if (!template || template.length === 0) {
             throw new Error('项目模版不存在！');
         }
@@ -58,21 +82,58 @@ class InitCommand extends Command {
         }
 
         return this.getProjectInfo();
-        // 2. 是否启动强制更新
-        // 3. 选择创建项目或者组件
-        // 4. 获取项目的基本信息
     }
 
-    downloadTemplate() {
-        // 1. 通过项目模版API获取项目模版信息
-        // 2. 通过egg.js搭建一套后端心痛
-        // 3. 通过npm存储项目模版（vue-cli/vue-element-admin）
-        // 4. 将项目模版信息存储到mongodb数据库中
-        // 5. 通过egg.js获取mongodb中的数据并且通过API返回
+    async downloadTemplate() {
+        console.log('function downloadTemplate () -------------------');
+        const { projectTemplate } = this.projectInfo;
+        const templateInfo = this.template.find(item => item.npmName === projectTemplate);
+        const targetPath = path.resolve(userHome, '.yzming-cli-dev', 'template');
+        const storeDir = path.resolve(userHome, '.yzming-cli-dev', 'template', 'node_modules');
+        const { npmName, version } = templateInfo;
+        this.templateInfo = templateInfo;
+        const templateNpm = new Package({
+            targetPath,
+            storeDir,
+            packageName: npmName,
+            packageVersion: version
+        });
+    
+        if (! await templateNpm.exists()) {
+            const spinner = spinnerStart('正在下载模版.....');
+            await sleep();
+            try {
+                await templateNpm.install();
+            } catch (e) {
+                throw e;
+            } finally {
+                spinner.stop(true);
+                if (await templateNpm.exists()) {
+                    log.success('下载模版成功！');
+                }
+                this.templateNpm = templateNpm;
+            }
+        } else {
+            console.log('更新模块------------------------');
+            const spinner = spinnerStart('正在更新模块.....');
+            await sleep();
+            try {
+                await templateNpm.update();
+            } catch (e) {
+                throw e;
+            } finally {
+                spinner.stop(true);
+                if (await templateNpm.exists()) {
+                    log.success('更新模版成功！');
+                }
+                this.templateNpm = templateNpm;
+            }
+
+        }
     }
 
     async getProjectInfo() {
-        const projectInfo = {};
+        let projectInfo = {};
         // 1. 选择创建项目或组件
         const { type } = await inquirer.prompt({
             type: 'list',
@@ -90,7 +151,7 @@ class InitCommand extends Command {
         if (type === TYPE_PROJECT) {
             // 2. 获取项目的基本信息 
             // TODO 项目名称验证不起作用
-            const o = await inquirer.prompt([{
+            const project = await inquirer.prompt([{
                 type: 'input',
                 name: 'projectName',
                 message: '请输入项目名称',
@@ -135,10 +196,20 @@ class InitCommand extends Command {
                 choices: this.createTemplateChoice()
             }
             ]);
-            projectInfo = { type: type, projectName: o.projectName, projectVersion: o.projectVersion };
+
+            projectInfo = {
+                type,
+                ...project
+            };
         } else if (type === TYPE_COMPONENT) {
 
         }
+
+        // 生成className
+        if(projectInfo.projectName) {
+            projectInfo.className = '';
+        }
+
         // return 项目的基本信息（object）
         return projectInfo;
     }
@@ -153,15 +224,95 @@ class InitCommand extends Command {
 
     async exec() {
         try {
+            console.log('function exec() --------');
             // 1. 准备阶段
             const projectInfo = await this.prepare();
             this.projectInfo = projectInfo;
             // 2. 下载模版
-            this.downloadTemplate();
+            await this.downloadTemplate();
             // 3. 安装模版
+            await this.installTemplate();
         } catch (e) {
             console.error(e.message);
         }
+    }
+
+    async installTemplate() {
+        if (this.templateInfo) {
+            if (!this.templateInfo.type) {
+                this.templateInfo.type = TEMPLATE_TYPE_NORMAL;
+            }
+
+            if (this.templateInfo.type === TEMPLATE_TYPE_NORMAL) {
+                await this.installNormalTemplate();
+            } else if (this.templateInfo.type === TEMPLATE_TYPE_CUSTOM) {
+                await this.installCustomTemplate();
+            }
+        } else {
+            throw new Error('项目模版不存在');
+        }
+    }
+
+    async installNormalTemplate() {
+        console.log('安装标准模版');
+        // 拷贝模版代码至当前目录
+        let spinner = spinnerStart('正在安装模版...');
+        try {
+            const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
+            const targetPath = process.cwd();
+            fse.ensureDirSync(templatePath);
+            fse.ensureDirSync(targetPath);
+            fse.copySync(templatePath, targetPath);
+        } catch(e) {
+            throw e;
+        } finally {
+            spinner.stop(true);
+            log.success('模版安装成功！');
+        }
+        // 安装依赖
+        const  { installCommand, startCommand } = this.templateInfo;
+        let installRet = '';
+        if(installCommand) {
+            const installCmd = installCommand.split(' ');
+            const cmd = this.checkCommand(installCmd[0]);
+            if(!cmd) {
+                throw new Error('命令不存在！ [npm, cnpm]', installCommand);
+            }
+            const args = installCmd.slice(1);
+            installRet = await execAsync(cmd, args, {
+                stdio: 'inherit',
+                cmd: process.cwd()
+            });
+        }
+
+        if(installRet !== 0) {
+            throw new Error('依赖安装过程中失败！');
+        }
+
+        // 启动命令执行
+        if(startCommand) {
+            const startCmd = startCommand.split(' ');
+            const cmd = startCmd[0];
+            if(!cmd) {
+                throw new Error('命令不存在！ [npm, cnpm]', startCommand);
+            }
+            const args = startCmd.slice(1);
+            await execAsync(cmd, args, {
+                stdio: 'inherit',
+                cmd: process.cwd()
+            });
+        }
+    }
+
+    async installCustomTemplate() {
+
+    }
+
+    checkCommand(cmd) {
+        if(WHITE_COMMAND.includes(cmd)) {
+            return cmd;
+        }
+        return null;
     }
 
     createTemplateChoice() {
