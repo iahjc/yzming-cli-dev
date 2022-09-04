@@ -27,6 +27,7 @@
     "url": "https://github.com/iahjc/yzming-cli-dev/issues"
   },
   "dependencies": {
-    "@yzming-cli-dev/package": "file:../../modules/package"
+    "@yzming-cli-dev/package": "file:../../modules/package",
+    "@yzming-cli-dev/log": "file:../../utils/log"
   }
 }

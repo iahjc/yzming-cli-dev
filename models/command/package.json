@@ -1,5 +1,5 @@
 {
-  "name": "@yzming-cli-dev/init",
+  "name": "@yzming-cli-dev/command",
   "version": "1.0.3",
   "description": "> TODO: description",
   "author": "alines <hanruigang@163.com>",
@@ -21,17 +21,13 @@
     "url": "git+https://github.com/iahjc/yzming-cli-dev.git"
   },
   "scripts": {
-    "test": "node ./__tests__/@yzming-cli-dev/init.test.js"
+    "test": "node ./__tests__/@yzming-cli-dev/command.test.js"
   },
   "bugs": {
     "url": "https://github.com/iahjc/yzming-cli-dev/issues"
   },
   "dependencies": {
-    "@yzming-cli-dev/command": "file:../../models/command",
-    "@yzming-cli-dev/log": "file:../../utils/log",
-    "@yzming-cli-dev/request": "file:../../utils/request",
-    "fs-extra": "^9.0.1",
-    "inquirer": "^7.3.3",
+    "colors": "^1.4.0",
     "semver": "^7.3.7"
   }
 }

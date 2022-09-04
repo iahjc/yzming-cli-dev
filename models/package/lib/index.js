@@ -2,10 +2,11 @@
 
 const pkgDir = require('pkg-dir').sync;
 const path = require('path');
+const fsa = require('fs-extra');
 const pathExists = require('path-exists');
 const npminstall = require('npminstall');
 const formatPath = require('@yzming-cli-dev/format-path');
-const { getDefaultRegistry } = require('@yzming-cli-dev/get-npm-info')
+const { getDefaultRegistry, getNpmLatestVersion } = require('@yzming-cli-dev/get-npm-info')
 const { isObject } = require('@yzming-cli-dev/utils');
 
 
@@ -22,27 +23,43 @@ class Package {
         // package的目标路径
         this.targetPath = options.targetPath;
         // package的缓存路径
-        this.storePath = options.storePath;
+        this.storeDir = options.storeDir;
         // package的name
         this.packageName = options.packageName;
         // package的version
         this.packageVersion = options.packageVersion;
+        // package缓存目录前缀
+        this.cacheFilePathPrefix = this.packageName.replace('/', '_');
     }
 
-    prepare() {
+    async prepare() {
+        if (this.storeDir && !pathExists(this.storeDir)) {
+            fsa.mkdirpSync(this.storeDir);
+        }
+        if (this.packageVersion === 'latest') {
+            this.packageVersion = await getNpmLatestVersion(this.packageName);
+        }
+    }
 
+    get cacheFilePath() {
+        return path.resolve(this.storeDir, `_${this.cacheFilePathPrefix}@${this.packageVersion}@${this.packageName}`);
+    }
+
+    getSpeficCacheFilePath(packageVersion) {
+        return path.resolve(this.storeDir, `_${this.cacheFilePathPrefix}@${packageVersion}@${this.packageName}`)
     }
 
     // 判断当前package是否存在
-    exists() {
+    async exists() {
         if (this.storeDir) {
-            this.prepare();
+            await this.prepare();
         } else {
             return pathExists(this.targetPath);
         }
     }
     // 安装package
-    install() {
+    async install() {
+        await this.prepare();
         return npminstall({
             root: this.targetPath,
             storeDir: this.storeDir,
@@ -56,23 +73,53 @@ class Package {
         })
     }
     // 更新package
-    update() { }
+    async update() {
+        await this.prepare();
+        // 1. 获取最新的npm模块版本号
+        const latestPackageVersion = await getNpmLatestVersion(this.packageName);
+        // 2. 查询最新版本号的路径是否存在
+        const latestFilePath = this.getSpeficCacheFilePath(latestPackageVersion);
+        // 3. 如果不存在，则直接安装最新版本
+        if (!pathExists(latestFilePath)) {
+            await npminstall({
+                root: this.targetPath,
+                storeDir: this.storeDir,
+                registry: getDefaultRegistry(),
+                pkgs: [
+                    {
+                        name: this.packageName,
+                        version: latestPackageVersion
+                    }
+                ]
+            });
+            this.packageVersion = latestPackageVersion;
+        }
+        return latestFilePath;
+    }
 
     // 获取入口文件的路径
     getRootFilePath() {
-        // 1. 获取package.json所在的目录
-        const dir = pkgDir(this.targetPath);
-        console.log(dir)
-        if (dir) {
-            // 2. 读取package.json
-            const pkgFile = require(path.resolve(dir, 'package.json'));
-            // 3. 寻找main/lib
-            if (pkgFile && pkgFile.main) {
-                // 4. 路径兼容（macOS/windows）
-                return formatPath(path.resolve(dir, pkgFile.main));
+        function _getRootFile(targetPath) {
+            // 1. 获取package.json所在的目录
+            const dir = pkgDir(targetPath);
+            if (dir) {
+                // 2. 读取package.json
+                const pkgFile = require(path.resolve(dir, 'package.json'));
+                // 3. 寻找main/lib
+                if (pkgFile && pkgFile.main) {
+                    // 4. 路径兼容（macOS/windows）
+                    return formatPath(path.resolve(dir, pkgFile.main));
+                }
             }
+            return null;
         }
-        return null;
+
+        if (this.storeDir) {
+            return _getRootFile(this.cacheFilePath);
+        } else {
+            return _getRootFile(this.targetPath);
+        }
+
     }
 }
 

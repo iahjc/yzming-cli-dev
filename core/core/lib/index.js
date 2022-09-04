@@ -34,7 +34,7 @@ async function core() {
 
 async function prepare() {
     checkPkgVersion();
-    checkNodeVersion();
+    // checkNodeVersion();  在多进程models/command/lib/index.js 调用
     checkRoot();
     checkUserHome();
     // 不需要做参数解析了 commander做了
@@ -54,10 +54,11 @@ function registerCommand() {
         .option('-d, --debug', '是否开启debug模式', false)
         .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '');
 
+        // 注册init命令 并交个exec去处理
     program
         .command('init [projectName]')
         .option('-f, --force', '是否强制初始化项目')
-        .action(exec);
+        .action(exec);  
 
     // 开启debug模式
     program.on('option:debug', function() {
@@ -69,7 +70,7 @@ function registerCommand() {
         //     process.env.LOG_LEVEL = 'info';
         // }
         log.level = process.env.LOG_LEVEL;
-        log.verbose('环境变量', 'test');
+        log.verbose('开启debug--------------- verbose-------');
     });
 
     // 指定targetPath
@@ -79,7 +80,6 @@ function registerCommand() {
 
     // 对未知命令监听
     program.on('command:*', function(obj) {
-        console.log(1)
         const availableCommands = program.commands.map(cmd => cmd.name());
         console.log(colors.red('未知的命令：' + obj[0]));
         if(availableCommands.length > 0) {

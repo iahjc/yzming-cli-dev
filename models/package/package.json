@@ -29,6 +29,7 @@
   "dependencies": {
     "@yzming-cli-dev/get-npm-info": "file:../../utils/get-npm-info",
     "@yzming-cli-dev/utils": "file:../../utils/utils",
+    "fs-extra": "^9.0.1",
     "npminstall": "^6.5.1",
     "path-exists": "^4.0.0"
   }
