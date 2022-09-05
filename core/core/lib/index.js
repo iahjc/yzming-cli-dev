@@ -95,7 +95,7 @@ function registerCommand() {
 }
 
 /**
- * 检查版本更新
+ * 检查脚手架版本更新
  */
 async function checkGlobalUpdate() {
     // 1. 获取当前版本号和模块名

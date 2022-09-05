@@ -25,7 +25,7 @@ async function exec() {
     // 安装最新版本
     const packageVersion = 'latest';
     let pkg = '';
-
+    log.verbose('targetPath -----------', targetPath);
     if (!targetPath) {
         targetPath = path.resolve(homePath, CACHE_DIR); // 生成缓存目录
         storeDir = path.resolve(targetPath, 'node_modules');

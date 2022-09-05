@@ -32,8 +32,11 @@
     "@yzming-cli-dev/package": "file:../../models/package",
     "@yzming-cli-dev/request": "file:../../utils/request",
     "@yzming-cli-dev/utils": "file:../../utils/utils",
+    "ejs": "^3.1.8",
     "fs-extra": "^9.0.1",
+    "glob": "^8.0.3",
     "inquirer": "^7.3.3",
+    "kebab-case": "^1.0.1",
     "semver": "^7.3.7",
     "user-home": "^2.0.0"
   }
